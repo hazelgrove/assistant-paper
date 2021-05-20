@@ -1,0 +1,50 @@
+\section{Assistant Calculus}\label{sec:assistant-calculus}
+
+blah blah blah types
+
+TODOs:
+\begin{itemize}
+    \item get cursor icons from hazelnut paper
+    \item get right arrow for bidi
+\end{itemize}
+
+\newcommand{\assistarrow}{\hookrightarrow}
+\newcommand{\bigalpha}{\mathrm{A}}
+
+\begin{figure}
+    \begin{mathpar}
+        \inferrule[Suggest Hole Synthetic]{
+            \mathsf{Intros}(\tau) \assistarrow \bigalpha_{intros} \\
+            \mathsf{Elims}(\tau) \assistarrow \bigalpha_{elims}
+        }{
+            \Gamma \vdash > \hehole{} < \Leftarrow \tau \assistarrow \bigalpha_{intros} \cup \bigalpha_{elims}
+        }
+        
+        %\inferrule[ELam]{
+        %    \expands{\Phi}{\Gamma, x : \taut{in}}{\hat e}{e}{\taut{out}}
+        %}{
+        %    \expands{\Phi}{\Gamma}{\hlam{x}{\hat e}}{\hlam{x}{e}}{\tarr{\taut{in}}{\taut{out}}}
+        %}~~~~~~~~\cdots
+
+        % \inferrule[EAp]{
+        %     \expands{\Phi}{\Gamma}{\hat e_1}{e_1}{\tarr{\taut{in}}{\taut{out}}}\\\\
+        %     \expands{\Phi}{\Gamma}{\hat e_2}{e_2}{\taut{in}}
+        % }{
+        %     \expands{\Phi}{\Gamma}{\hap{\hat e_1}{\hat e_2}}{\hap{e_1}{e_2}}{\taut{out}}
+        % }
+        %\inferrule[EApLivelit]{
+        %    \livelitCtxEntry{a}{\taut{expand}}{\taut{model}}{\dtxt{expand}} \in \Phi\\\\
+        %    \hasType{ }{\dtxt{model}}{\taut{model}}\\
+        %    \evalsTo{\hap{\dtxt{expand}}{\dtxt{model}}}{\dtxt{encoded}}\\
+        %    \decodeExp{\dtxt{encoded}}{\etxt{pexpansion}}\\\\
+        %    \hasType{ }{\etxt{pexpansion}}{\tarr{\{\tau_i\}_{i < n}}{\taut{expand}}}\\
+        %    \{ \expands{\Phi}{\Gamma}{\hat e_i}{e_i}{\tau_i} \}_{i < n}
+        %}{
+        %    \expands{\Phi}{\Gamma}{\haplivelit{u}{a}{\dtxt{model}}{\splat{\hsplice{\hat e_i}{\tau_i}}}}{
+        %        \hap{\etxt{pexpansion}}{\{e_i\}_{i < n}}
+        %    }{\taut{expand}}
+        %}
+    \end{mathpar}
+    \caption{Base suggestion judgments}
+    \label{fig:suggests}
+    \end{figure}

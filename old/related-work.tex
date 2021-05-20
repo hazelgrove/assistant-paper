@@ -1,0 +1,105 @@
+\section{Related Work}\label{sec:related-work}
+As detailed in Sec.~\ref{sec:background},
+the Graphite system developed the idea of filling 
+typed holes using a type-specific user interface, and it was the starting 
+point for our work \cite{Graphite}.
+Subsequent work on \textbf{mage} further explores this design space \cite{DBLP:conf/uist/KeryRHMWP20}.
+This prior work engaged in substantial qualitative evaluations, 
+which due to the fundamental similarities between the two systems 
+is as relevant to our design as theirs. However, the prior work 
+left a number of core technical issues unresolved,
+as summarized Sec.~\ref{sec:contributions}.
+Livelits resolve these in large part by bringing together  ideas from other recent work.
+
+In particular, recent work on type-specific languages (TSLs) \cite{TSLs} 
+and typed literal macros (TLMs) \cite{TLMs}
+explored similar ideas of user-defined
+literal forms with support for hygienic splicing, with the former 
+using type-directed dispatch similar to Graphite and the latter supporting 
+decentralized extensibility via explicit naming as in our approach. 
+However, these systems operate in a purely 
+textual setting and have no support for live feedback.
+The typed expansion judgement central to the typed livelit calculus in this paper 
+is structured similarly 
+to the corresponding judgements in the formal systems describing TLMs and TSLs,
+and the reasoning principles are closely related. However, the  
+approach to capture avoidance we take is both more restrictive and cleaner by its use of function application 
+rather than direct insertion of splices (and could perhaps be ported to those formalisms).
+Splices also operate quite differently in our work,
+because they are placed automatically and structurally delimited in the user interface, rather than 
+placed by the client and then parsed out of the text by a custom parser charged 
+with retaining provenance information.
+This substantially complicates the design of splices in that work.
+
+Recent work on a interactive visual macro system in Racket 
+is quite similar in spirit to our work \cite{interactive-visual-syntax}.
+However, it supports only a limited form of splicing via a pop up text editor
+that does not support full compositionality as described here, where livelits 
+can appear within other livelits. Splicing is not strictly hygienic, though 
+Racket's scope management machine can be used by macros to voluntarily 
+maintain a binding discipline \cite{DBLP:conf/popl/Flatt16}. There is not any 
+consideration of typing. Parameterization and partial application is also impossible, because invocation 
+is via an editor command rather than a syntactic mechanism. Finally,
+there is no support for liveness: macro evaluation occurs in the editor 
+environment, not the run-time environment of the program being written, 
+so splice evaluation would not work correctly (except in trivial cases
+where the splice was, e.g., a closed expression, or used only standard 
+library constructs).
+
+Our structural delimitation of splices is reminiscent of work on 
+\emph{language boxes} \cite{DBLP:conf/sle/RenggliDN09}, which focused on 
+combining different notations, primarily textual, using structural delimiters inserted 
+explicitly using a special-purpose editor. 
+
+There has been a long line of research on \emph{projectional editing}, where
+the user edits graphical representations (projections) of code constructs 
+\cite{DBLP:journals/ile/MillerPMV94,read1996generating,DBLP:conf/sde/Reiss84,DBLP:conf/uist/KoM05}. Livelits are a form of projectional editing. 
+Many of the oldest systems offer only a fixed set of projections and interaction techniques. 
+More recently, language workbenches with support for projectional editing like Citrus \cite{DBLP:conf/uist/KoM05}
+and MPS \cite{voelter2011language} have made it easier to define new projectional editors.
+However, these systems generate entire editors, whereas livelit definitions 
+are defined in libraries. 
+Furthermore, livelit definitions are governed by a type and binding discipline.
+% In many ways, an unfamiliar livelit can be approached much like an unfamiliar function
+% can be approached: by inspecting its declarations and reasoning compositionally 
+% about arguments, i.e. splices and parameters.
+Finally, livelits are uniquely live, building on Hazelnut Live \cite{HazelnutLive}.
+
+A number of notebook systems, including Mathematica, Jupyter \cite{Guo13}, and others, do 
+support the insertion of simple widgets like sliders that respond live to changes.
+These systems inspired our approach but they are not compositional: only constant values can be constructed, as with Graphite.
+
+Related to projectional editors are 
+a variety of systems that generate visualizations from code \cite{DBLP:conf/chi/Lerner20,koschke2003software,urquiza2004survey}. Livelits differ 
+from these systems in directionality: visualization systems are given code and generate
+a visualization, whereas livelits are generate code where there would otherwise
+be a hole.
+
+Conal Elliott's work on tangible functional programming \cite{DBLP:conf/icfp/Elliott07} similarly explored a
+system allows editing a graphical representation of code in compositional ways, 
+but the editing representation itself is fixed as a series of connected windows.
+Only the visual representation is customizable.
+
+The Vital programming environment for Haskell \cite{hanna2002interactive} 
+supports type-specific stylesheets
+that can be used to create custom user interfaces for both editing and displaying
+values. The editors support splices, called \emph{cells}, that can contain 
+Haskell code. Results are computed in a live manner, though there is no support
+for evaluating incomplete programs. The visualizations themselves cannot provide
+live feedback. Moreover, the system does not enforce any hygiene or typing principles:
+the user is entirely responsible for syntactic and semantic correctness.
+
+
+% Hazelnut
+% Hazelnut Live
+% Its Alive! paper (GUI widgets)
+% Tangible FUnctional Programming 
+% Vital https://dl.acm.org/doi/10.1145/581478.581493 and https://link.springer.com/chapter/10.1007/11964681_12
+% Projection Boxes http://cseweb.ucsd.edu/~lerner/proj-boxes.html
+% Tiny Structure Editors for Low Low Prices
+% Typed Holes Work (synthesis stuff from Haskell, mention Haskell)
+% Pharo / Smalltalk 
+% GEC Toolkit: https://link.springer.com/chapter/10.1007/11546382_5
+% Previous use of live literals https://homepages.cwi.nl/~storm/livelit/livelit.html
+% Visual Haskell and related visual programming environments: https://pdfs.semanticscholar.org/6e43/5494ef1aaaa6ec0fcf47bb5b03d7c06ef937.pdf
+% widgets in dataflow languages like puredata and labview
