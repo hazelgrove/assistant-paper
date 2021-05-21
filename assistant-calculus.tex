@@ -4,22 +4,56 @@ blah blah blah types
 
 TODOs:
 \begin{itemize}
-    \item get cursor icons from hazelnut paper
-    \item get right arrow for bidi
+    \item get cursor icons from hazelnut paper DONE
+    \item get right arrow for bidi DONE
 \end{itemize}
 
-\newcommand{\assistarrow}{\hookrightarrow}
-\newcommand{\bigalpha}{\mathrm{A}}
+\newcommand{\singleton}[1]{\{ #1 \}}
+\newcommand{\singleaction}[1]{\singleton{\mathtt{#1}}}
+
 
 \begin{figure}
     \begin{mathpar}
-        \inferrule[Suggest Hole Synthetic]{
-            \mathsf{Intros}(\tau) \assistarrow \bigalpha_{intros} \\
-            \mathsf{Elims}(\tau) \assistarrow \bigalpha_{elims}
+        \inferrule[Suggest Hole Analytic]{
+            \suggest{\mathsf{Intros}(\tau)}{\bigalpha_{intros}} \\
+            \suggest{\mathsf{Elims}(\Gamma, \tau)}{\bigalpha_{elims}}
         }{
-            \Gamma \vdash > \hehole{} < \Leftarrow \tau \assistarrow \bigalpha_{intros} \cup \bigalpha_{elims}
+            \suggest
+                {\hana{\hGamma}{\zwsel{\hehole{}}}{\tau}}
+                {\bigalpha_{intros} \cup \bigalpha_{elims}}
         }
+
+        \inferrule[Suggest Elims]{
+            \suggest{\mathsf{ElimCase}}{\bigalpha_{case}} \\
+            \suggest{\mathsf{Var}(\Gamma, \tau)}{\bigalpha_{var}} \\
+            \suggest{\mathsf{VarApp}(\Gamma, \tau)}{\bigalpha_{varapp}} \\
+            \suggest{\mathsf{Proj}(\Gamma, \tau)}{\bigalpha_{proj}} \\
+        }{
+         \suggest
+            {\mathsf{Elims}(\Gamma, \tau)}
+            {\bigalpha_{case} \cup \bigalpha_{var} \cup \bigalpha_{varapp} \cup \bigalpha_{proj}}
+        }
+
+        \inferrule[IntrosTriv]{ }
+            {\suggest
+                {\mathsf{Intros}(\tunit)}
+                {\singleaction{construct\; triv}}}\
+
+        \inferrule[IntrosProd]{ }
+            {\suggest
+                {\mathsf{Intros}(\tprod{\tau_1}{\tau_2})}
+                {\singleaction{construct\; pair}}}
         
+        \inferrule[IntrosArrow]{ }
+            {\suggest
+                {\mathsf{Intros}(\tarr{\tau_1}{\tau_2})}
+                {\singleaction{construct\; lam\; x}}}
+
+        \inferrule[IntrosSum]{ }
+            {\suggest
+                {\mathsf{Intros}(\tsum{\tau_1}{\tau_2})}
+                {\mathtt{construct\; inj\; L},
+                 \mathtt{construct\; inj\; R}}}
         %\inferrule[ELam]{
         %    \expands{\Phi}{\Gamma, x : \taut{in}}{\hat e}{e}{\taut{out}}
         %}{
