@@ -4,13 +4,71 @@ blah blah blah types
 
 TODOs:
 \begin{itemize}
-    \item get cursor icons from hazelnut paper DONE
-    \item get right arrow for bidi DONE
+    \item \sout{get cursor icons from hazelnut paper}
+    \item \sout{get right arrow for bidi}
+    \item \sout{basic zipper cases}
+    \item remaining zipper cases
+    \item var + varapp
+    \item proj
+    \item \sout{base case for hole}
+    \item base cases for non-empty holes, incld:
+    \item delete + act for general hexps
+    \item wrap for non-empty-holes
 \end{itemize}
 
 \newcommand{\singleton}[1]{\{ #1 \}}
 \newcommand{\singleaction}[1]{\singleton{\mathtt{#1}}}
 
+\begin{figure}
+    \begin{mathpar}
+
+        \fbox{$\suggest
+        {\hsyn{\hGamma}{\zexp}{\tau}}
+        {\bigalpha}$}~~\text{$\hexp$ synthesizes $\tau$, suggesting actions $\bigalpha$} \\
+
+        \fbox{$\suggest
+        {\hana{\hGamma}{\zexp}{\tau}}
+        {\bigalpha}$}~~\text{$\hexp$ analyzes against $\tau$, suggesting actions $\bigalpha$}  \\
+        
+        \inferrule[]{
+            \hana{\hGamma}{\hexp}{\tau_2} \\
+            \suggest
+                {\hana{\hGamma}{\zexp}{\tau_1}}
+                {\bigalpha}
+        }{
+            \suggest
+                {\hsyn{\hGamma}{(\zexp, \hexp)}{\tprod{\tau_1}{\tau_2}}}
+                {\bigalpha}
+        }
+
+        \inferrule[]{
+            \suggest
+                {\hsyn{\hGamma}{\zexp}{\tau_1}}
+                {\bigalpha} \\
+            \arrmatch{\tau_1}{\tarr{\tau_2}{\tau}} \\
+            \hana{\hGamma}{\hexp}{\tau_2}
+        }{
+            \suggest
+                {\hsyn{\hGamma}{\zexp(\hexp)}{\tau}}
+                {\bigalpha}
+        }
+
+        \inferrule[]{
+            \arrmatch{\tau}{\tarr{\tau_1}{\tau_2}} \\
+            \suggest
+                {\hana{\hGamma}{\zexp}{\tau}}
+                {\bigalpha}
+        }{
+            \suggest
+                {\hana{\hGamma}{\hlam{x}{\zexp}}{\tau}}
+                {\bigalpha}
+        }
+
+
+    \end{mathpar}
+    \caption{Suggestion Zipper Cases}
+    \label{fig:suggests_zipper}
+\end{figure}
 
 \begin{figure}
     \begin{mathpar}
@@ -23,21 +81,18 @@ TODOs:
                 {\bigalpha_{intros} \cup \bigalpha_{elims}}
         }
 
-        \inferrule[Suggest Elims]{
-            \suggest{\mathsf{ElimCase}}{\bigalpha_{case}} \\
-            \suggest{\mathsf{Var}(\Gamma, \tau)}{\bigalpha_{var}} \\
-            \suggest{\mathsf{VarApp}(\Gamma, \tau)}{\bigalpha_{varapp}} \\
-            \suggest{\mathsf{Proj}(\Gamma, \tau)}{\bigalpha_{proj}} \\
-        }{
-         \suggest
-            {\mathsf{Elims}(\Gamma, \tau)}
-            {\bigalpha_{case} \cup \bigalpha_{var} \cup \bigalpha_{varapp} \cup \bigalpha_{proj}}
-        }
+    \end{mathpar}
+    \caption{Suggestion base cases}
+    \label{fig:suggests}
+\end{figure}
 
+\begin{figure}
+    \begin{mathpar}
+    
         \inferrule[IntrosTriv]{ }
             {\suggest
                 {\mathsf{Intros}(\tunit)}
-                {\singleaction{construct\; triv}}}\
+                {\singleaction{construct\; triv}}}
 
         \inferrule[IntrosProd]{ }
             {\suggest
@@ -54,31 +109,51 @@ TODOs:
                 {\mathsf{Intros}(\tsum{\tau_1}{\tau_2})}
                 {\mathtt{construct\; inj\; L},
                  \mathtt{construct\; inj\; R}}}
-        %\inferrule[ELam]{
-        %    \expands{\Phi}{\Gamma, x : \taut{in}}{\hat e}{e}{\taut{out}}
-        %}{
-        %    \expands{\Phi}{\Gamma}{\hlam{x}{\hat e}}{\hlam{x}{e}}{\tarr{\taut{in}}{\taut{out}}}
-        %}~~~~~~~~\cdots
 
-        % \inferrule[EAp]{
-        %     \expands{\Phi}{\Gamma}{\hat e_1}{e_1}{\tarr{\taut{in}}{\taut{out}}}\\\\
-        %     \expands{\Phi}{\Gamma}{\hat e_2}{e_2}{\taut{in}}
-        % }{
-        %     \expands{\Phi}{\Gamma}{\hap{\hat e_1}{\hat e_2}}{\hap{e_1}{e_2}}{\taut{out}}
-        % }
-        %\inferrule[EApLivelit]{
-        %    \livelitCtxEntry{a}{\taut{expand}}{\taut{model}}{\dtxt{expand}} \in \Phi\\\\
-        %    \hasType{ }{\dtxt{model}}{\taut{model}}\\
-        %    \evalsTo{\hap{\dtxt{expand}}{\dtxt{model}}}{\dtxt{encoded}}\\
-        %    \decodeExp{\dtxt{encoded}}{\etxt{pexpansion}}\\\\
-        %    \hasType{ }{\etxt{pexpansion}}{\tarr{\{\tau_i\}_{i < n}}{\taut{expand}}}\\
-        %    \{ \expands{\Phi}{\Gamma}{\hat e_i}{e_i}{\tau_i} \}_{i < n}
-        %}{
-        %    \expands{\Phi}{\Gamma}{\haplivelit{u}{a}{\dtxt{model}}{\splat{\hsplice{\hat e_i}{\tau_i}}}}{
-        %        \hap{\etxt{pexpansion}}{\{e_i\}_{i < n}}
-        %    }{\taut{expand}}
-        %}
     \end{mathpar}
-    \caption{Base suggestion judgments}
-    \label{fig:suggests}
-    \end{figure}
+    \caption{Introduction suggestions}
+    \label{fig:suggest_intros}
+\end{figure}
+
+\begin{figure}
+    \begin{mathpar}
+
+        \inferrule[Suggest Elims]{
+            \suggest{\mathsf{ElimCase}}{\bigalpha_{case}} \\
+            \suggest{\mathsf{Var}(\Gamma, \tau)}{\bigalpha_{var}} \\
+            \suggest{\mathsf{VarApp}(\Gamma, \tau)}{\bigalpha_{varapp}} \\
+            \suggest{\mathsf{Proj}(\Gamma, \tau)}{\bigalpha_{proj}} \\
+        }{
+         \suggest
+            {\mathsf{Elims}(\Gamma, \tau)}
+            {\bigalpha_{case} \cup \bigalpha_{var} \cup \bigalpha_{varapp} \cup \bigalpha_{proj}}
+        }
+
+        \inferrule[ElimCase]
+            { }
+            {\suggest
+                {\mathsf{ElimCase}}
+                {\singleaction{construct\; case\; x\; y}}}
+
+        \inferrule[Var]
+            { TODO }
+            {\suggest
+                {\mathsf{Var}(\Gamma, \tau)}
+                {TODO}}
+
+        \inferrule[VarApp]
+            { TODO }
+            {\suggest
+                {\mathsf{VarApp}(\Gamma, \tau)}
+                {TODO}}
+
+        \inferrule[Proj]
+            { TODO }
+            {\suggest
+                {\mathsf{Proj}(\Gamma, \tau)}
+                {TODO}}
+
+    \end{mathpar}
+    \caption{Elimination suggestions}
+    \label{fig:suggest_elims}
+\end{figure}
