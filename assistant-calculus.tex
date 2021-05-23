@@ -8,16 +8,23 @@ TODOs:
     \item \sout{get right arrow for bidi}
     \item \sout{basic zipper cases}
     \item remaining zipper cases
-    \item var + varapp
-    \item proj
+    \item \sout{var + varapp}
+    \item NOTE: we basically need a construct expression action for varapp
+    \item \sout{proj} NOT SURE THIS IS QUITE RIGHT...
     \item \sout{base case for hole}
-    \item base cases for non-empty holes, incld:
-    \item delete + act for general hexps
-    \item wrap for non-empty-holes
+    \item \sout{base cases for non-empty holes, incld:}
+    \item \sout{delete + act for general hexps}
+    \item \sout{simple wrap for exprs incld. non-empty-holes}
+    \item complex (n-ary) wraps
+    \item iterated wraps? with cutoffs? (:jean-shorts-emoji)
+    \item are there non-empty-hole suggests distinct from arbitrary expr suggests?
 \end{itemize}
 
 \newcommand{\singleton}[1]{\{ #1 \}}
 \newcommand{\singleaction}[1]{\singleton{\mathtt{#1}}}
+\newcommand{\varapparrow}[0]{\rightsquigarrow}
+\newcommand{\varappjudge}[4]{#1 \vdash #2 \varapparrow #3 \Leftarrow #4}
+\newcommand{\projjudge}[4]{#1 \vdash #2 \twoheadrightarrow #3 \Leftarrow #4}
 
 \begin{figure}
     \begin{mathpar}
@@ -49,7 +56,7 @@ TODOs:
             \hana{\hGamma}{\hexp}{\tau_2}
         }{
             \suggest
-                {\hsyn{\hGamma}{\zexp(\hexp)}{\tau}}
+                {\hsyn{\hGamma}{\dap{\zexp}{\hexp}}{\tau}}
                 {\bigalpha}
         }
 
@@ -81,6 +88,34 @@ TODOs:
                 {\bigalpha_{intros} \cup \bigalpha_{elims}}
         }
 
+        \inferrule[Suggest Expr Analytic]{
+            \suggest{\mathsf{Wraps}(\hexp, \tau)}{\bigalpha_{wraps}} \\
+            \suggest{\mathsf{Replaces}(\Gamma, \tau)}{\bigalpha_{replaces}}
+        }{
+            \suggest
+                {\hana{\hGamma}{\zwsel{\hexp}}{\tau}}
+                {\bigalpha_{wraps} \cup \bigalpha_{replaces}}
+        }
+
+        \inferrule[Replacement]{
+            \suggest
+                {\hana{\hGamma}{\zwsel{\hehole{}}}{\tau}}
+                {\bigalpha}
+        }
+        {
+            \suggest
+                {\mathsf{Replaces}(\Gamma, \tau)}
+                {\{ \mathtt{del} \;;\; \alpha  \;|\; \alpha \in \bigalpha\}}
+        }
+
+        \inferrule[Wrapping (simple)]{
+            \hsyn{\hGamma}{\hexp}{\tau'}
+        }
+        {
+            \suggest
+                {\mathsf{Wraps}(\hexp, \tau)}
+                {\{ \mathtt{construct\;} \dap{f}{\hexp} \;|\; f : \tarr{\tau'}{\tau} \in \Gamma\}}
+        }        
     \end{mathpar}
     \caption{Suggestion base cases}
     \label{fig:suggests}
@@ -136,24 +171,70 @@ TODOs:
                 {\singleaction{construct\; case\; x\; y}}}
 
         \inferrule[Var]
-            { TODO }
+            { }
             {\suggest
                 {\mathsf{Var}(\Gamma, \tau)}
-                {TODO}}
+                {\{\mathtt{construct \; var \; x} \;|\; x : \tau  \in \Gamma\}}}
 
         \inferrule[VarApp]
-            { TODO }
+            { }
             {\suggest
                 {\mathsf{VarApp}(\Gamma, \tau)}
-                {TODO}}
+                {\{\mathtt{construct \; e}
+                 \;|\;
+                 \varappjudge{\Gamma, x : \tau}{x}{e}{\tau}\}}}
 
         \inferrule[Proj]
-            { TODO }
+            { }
             {\suggest
                 {\mathsf{Proj}(\Gamma, \tau)}
-                {TODO}}
+                {\{\mathtt{construct \; e}
+                 \;|\;
+                 \projjudge{\Gamma, x : \tau}{x}{e}{\tau}\}}}
 
     \end{mathpar}
     \caption{Elimination suggestions}
     \label{fig:suggest_elims}
+\end{figure}
+
+\begin{figure}
+    \begin{mathpar}
+        \fbox{$\varappjudge{\Gamma}{\hexp}{\hexp'}{\tau}$} \\
+        ~~\text{$\hexp$, applied to 0 or more holes, yields an expr analyzing to $\tau$} \\
+
+        \fbox{$\projjudge{\Gamma}{\hexp}{\hexp'}{\tau}$} \\
+        ~~\text{$\hexp$, projected 0 or more times, yields an expr analyzing to $\tau$} \\
+
+        \inferrule[VarApp1]
+            {\hsyn{\Gamma}{\hexp}{\tau}}
+            {\varappjudge{\Gamma}{e}{e}{\tau}}
+
+        \inferrule[VarApp2]
+            {
+                \hsyn{\Gamma}{\hexp}{\tarr{\_}{\_}} \\
+                \varappjudge{\Gamma}{\dap{\hexp}{\hehole{}}}{\hexp'}{\tau}
+            }
+            {c}
+
+        \inferrule[Proj1]
+                {\hsyn{\Gamma}{\hexp}{\tau}}
+                {\projjudge{\Gamma}{\hexp}{\hexp}{\tau}}
+
+        \inferrule[Proj2]
+                {
+                    \hsyn{\Gamma}{\hexp}{\tprod{\tau}{\tau'}} \\
+                    \projjudge{\Gamma}{\pi_1 \hexp}{\hexp'}{\tau}
+                }
+                {\projjudge{\Gamma}{e}{e'}{\tau}}
+        
+        \inferrule[Proj3]
+                {
+                    \hsyn{\Gamma}{\hexp}{\tprod{\tau'}{\tau}} \\
+                    \projjudge{\Gamma}{\pi_2 \hexp}{\hexp'}{\tau}
+                }
+                {\projjudge{\Gamma}{e}{e'}{\tau}}   
+
+    \end{mathpar}
+    \caption{Supporting elimination judgments}
+    \label{fig:support_elims}
 \end{figure}
