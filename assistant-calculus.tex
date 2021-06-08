@@ -7,10 +7,10 @@ TODOs:
     \item \sout{get cursor icons from hazelnut paper}
     \item \sout{get right arrow for bidi}
     \item \sout{basic zipper cases}
-    \item remaining zipper cases
+    \item remaining zipper cases? do i need to actually include mirror cases?
     \item \sout{var + varapp}
-    \item NOTE: we basically need a construct expression action for varapp
-    \item \sout{proj} NOT SURE THIS IS QUITE RIGHT...
+    \item \sout{NOTE: we basically need a construct expression action for varapp}
+    \item \sout{proj}
     \item \sout{base case for hole}
     \item \sout{base cases for non-empty holes, incld:}
     \item \sout{delete + act for general hexps}
@@ -28,6 +28,9 @@ TODOs:
     \item rankings:
     \item priviledge more specific types
     \item read contextual modal types
+    \item \sout{replace constructs with construct-expressions}
+    \item AppProj needs a better treatment for selection (should be first non-empty hole)... chain a separate action?
+    \item implementation: implement ENTER vs TAB
 \end{itemize}
 
 \newcommand{\singleton}[1]{\{ #1 \}}
@@ -125,7 +128,7 @@ TODOs:
         {
             \suggest
                 {\mathsf{Wraps}(\hexp, \tau)}
-                {\{ \mathtt{construct\;} \dap{f}{\hexp} \;|\; f : \tarr{\tau'}{\tau} \in \Gamma\}}
+                {\{ \mathtt{construct\;} \dap{f}{\zwsel{\hexp}} \;|\; f : \tarr{\tau'}{\tau} \in \Gamma\}}
         }        
     \end{mathpar}
     \caption{Suggestion base cases}
@@ -139,26 +142,26 @@ TODOs:
             {\tconsistent{\tau}{\tunit}}
             {\suggest
                 {\mathsf{Intros}(\tau)}
-                {\singleaction{construct\; triv}}}
+                {\singleaction{construct\; \zwsel{()}}}}
 
         \inferrule[IntrosProd]
             {\tconsistent{\tau}{\tprod{\tau_1}{\tau_2}}}
             {\suggest
                 {\mathsf{Intros}(\tau)}
-                {\singleaction{construct\; pair}}}
+                {\singleaction{construct\; \hpair{\zwsel{\hehole{}}}{\hehole{}}}}}
         
         \inferrule[IntrosArrow]
             {\tconsistent{\tau}{\tarr{\tau_1}{\tau_2}}}
             {\suggest
                 {\mathsf{Intros}(\tau)}
-                {\singleaction{construct\; lam\; x}}}
+                {\singleaction{construct\; \hlam{x}{\zwsel{\hehole{}}}}}}
 
         \inferrule[IntrosSum]
             {\tconsistent{\tau}{\tsum{\tau_1}{\tau_2}}}
             {\suggest
                 {\mathsf{Intros}(\tau)}
-                {\mathtt{construct\; inj\; L},
-                 \mathtt{construct\; inj\; R}}}
+                {\{ \mathtt{construct\; \hinL{\zwsel{\hehole{}}}},
+                 \mathtt{construct\; \hinR{\zwsel{\hehole{}}}}} \}}
 
     \end{mathpar}
     \caption{Introduction suggestions}
@@ -171,30 +174,30 @@ TODOs:
         \inferrule[Suggest Elims]{
             \suggest{\mathsf{ElimCase}}{\bigalpha_{case}} \\
             \suggest{\mathsf{Var}(\Gamma, \tau)}{\bigalpha_{var}} \\
-            \suggest{\mathsf{AppProj}(\Gamma, \tau)}{\bigalpha_{varapp}} \\
+            \suggest{\mathsf{AppProj}(\Gamma, \tau)}{\bigalpha_{approj}} \\
         }{
          \suggest
             {\mathsf{Elims}(\Gamma, \tau)}
-            {\bigalpha_{case} \cup \bigalpha_{var} \cup \bigalpha_{varapp} \cup \bigalpha_{proj}}
+            {\bigalpha_{case} \cup \bigalpha_{var} \cup \bigalpha_{approj}}
         }
 
         \inferrule[ElimCase]
             { }
             {\suggest
                 {\mathsf{ElimCase}}
-                {\singleaction{construct\; case\; x\; y}}}
+                {\singleaction{construct\; \hcase{\zwsel{\hehole{}}}{x}{\hehole{}}{y}{\hehole{}}}}}
 
         \inferrule[Var]
             {\tconsistent{\tau}{\tau'}}
             {\suggest
                 {\mathsf{Var}(\Gamma, \tau)}
-                {\{\mathtt{construct \; var \; x} \;|\; x : \tau' \in \Gamma\}}}
+                {\{\mathtt{construct \; \zwsel{x}} \;|\; x : \tau' \in \Gamma\}}}
 
         \inferrule[AppProj]
             {\tconsistent{\tau}{\tau'}}
             {\suggest
-                {\mathsf{VarApp}(\Gamma, \tau)}
-                {\{\mathtt{construct \; e}
+                {\mathsf{AppProj}(\Gamma, \tau)}
+                {\{\mathtt{construct \; \zwsel{e}}
                  \;|\;
                  x : \tau' \in \Gamma \; \wedge \; \varappjudge{\Gamma}{x}{e}{\tau}\}}}
 
@@ -206,11 +209,9 @@ TODOs:
 \begin{figure}
     \judgbox
         {\varappjudge{\Gamma}{\hexp}{\hexp'}{\tau}}
-        { \\ $\hexp$, applied to 0 or more holes, and projected 0 or more times, \\
+        { \\ $\hexp$, applied to 0 or more holes, \\ and projected 0 or more times, \\
          yields an expr analyzing to $\tau$}
-         
     \begin{mathpar}
-
         \inferrule[AppProjBase]
             {\hana{\Gamma}{\hexp}{\tau}}
             {\varappjudge{\Gamma}{e}{e}{\tau}}
