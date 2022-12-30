@@ -1,10 +1,15 @@
+
 \section{Assistant Calculus}\label{sec:assistant-calculus}
 
 blah blah blah types
+{\fontspec{Symbola}\symbol{"1F4CE}}
+{\fontspec{Symbola}\symbol{"1F4CE}}
+\paperclip
+$\paperclip$
 
 TODOs:
 \begin{itemize}
-    \item \sout{get cursor icons from hazelnut paper}
+    \item \sout{get cursor icons from hazelnut paper }
     \item \sout{get right arrow for bidi}
     \item \sout{basic zipper cases}
     \item remaining zipper cases? do i need to actually include mirror cases?
@@ -34,10 +39,20 @@ TODOs:
     \item add keyboard shortcuts for swap etc
     \item proj1 and proj2: make tau in product another underscore
     \item intro rule for type=hole
-    \item fig 4 var and appproj case: type consistency not premise: put in 
+    \item fig 4 var and approj case: type consistency not premise: put in 
     \item read: polarity: noam zalburger. bob harper blog post
     \item what does it mean to synthesize 'action a': sensibility theorem:
-    \item well-typed in tsynthetid case, checked against tau in analytic case 
+    \item well-typed in synthetic case, checked against tau in analytic case
+    \item $\suggest{A}{B}$
+    \item $\suggestp{A}{B}$
+    \item $\paperclip$
+    \item NEW
+    \item synthetic  pos: everything
+    \item sensibility: all actions result in well-typed states
+    \item constructiblity of complete terms: with move to next hole
+    \item scorers: symbol + subscript for judgement (num holes judgement)
+    
+    
 \end{itemize}
 
 \newcommand{\singleton}[1]{\{ #1 \}}
@@ -46,99 +61,205 @@ TODOs:
 \newcommand{\varappjudge}[4]{#1 \vdash #2 \varapparrow #3 \Leftarrow #4}
 \newcommand{\projjudge}[4]{#1 \vdash #2 \twoheadrightarrow #3 \Leftarrow #4}
 
+
+
+\newpage
+
+
+
+\begin{figure}[t]
+    $\arraycolsep=4pt
+    \begin{array}{lllllll}
+    
+    \mathsf{HTyp} & \tau & ::= &
+        \tunit ~\vert~
+        \tsum{\tau}{\tau} ~\vert~
+        \tprod{\tau}{\tau} ~\vert~
+        \tarr{\tau}{\tau} ~\vert~
+        \tehole\\
+
+    \mathsf{HExp} & \hexp & ::= &
+        () ~\vert~
+        L~e ~\vert~
+        R~e ~\vert~
+        ({\hexp},{\hexp}) ~\vert~
+        x ~\vert~
+        {\hlam{x}{\hexp}} ~\vert~
+        {\hexp}(\hexp) ~\vert~
+        \hehole ~\vert~
+        \hhole{\hexp}
+  
+    \end{array}$
+    \caption{Syntax of H-types and H-expressions. Metavariable $x$ ranges over variables.}
+    \label{fig:hexp-syntax}
+\end{figure}
+
 \begin{figure}
-    \begin{mathpar}
-
-        \fbox{$\suggest
+    \centering
+    \fbox{$\suggest
         {\hsyn{\hGamma}{\zexp}{\tau}}
-        {\bigalpha}$}~~\text{$\hexp$ synthesizes $\tau$, suggesting actions $\bigalpha$} \\
-
-        \fbox{$\suggest
+        {\bigalpha}$}~~\text{$\hexp$ synthesizes $\tau$, suggesting actions $\bigalpha$}
+    \\
+    \fbox{$\suggest
         {\hana{\hGamma}{\zexp}{\tau}}
         {\bigalpha}$}~~\text{$\hexp$ analyzes against $\tau$, suggesting actions $\bigalpha$}  \\
-        
-        \inferrule[]{
+    \caption{Suggestion Judgement Forms}
+    \label{fig:suggest_judge}
+\end{figure}
+
+\begin{figure}
+    \begin{mathpar}
+    \centering
+    \inferrule[]{
+            \suggest
+                {\hana{\hGamma}{\zexp}{\tau_1}}
+                {\bigalpha}
+        }{
+            \suggest
+                {\hana{\hGamma}{L~\zexp}{\tsum{\tau_1}{\tau_2}}}
+                {\bigalpha}
+        }
+    \\
+    \inferrule[]{
+            \suggest
+                {\hana{\hGamma}{\zexp}{\tau_2}}
+                {\bigalpha}
+        }{
+            \suggest
+                {\hana{\hGamma}{R~\zexp}{\tsum{\tau_1}{\tau_2}}}
+                {\bigalpha}
+        }
+    \\
+    \inferrule[]{
             \hana{\hGamma}{\hexp_1}{\tau_2} \\
             \suggest
                 {\hana{\hGamma}{\zexp_2}{\tau_1}}
                 {\bigalpha}
         }{
             \suggest
-                {\hsyn{\hGamma}{(\zexp_1, \hexp_2)}{\tprod{\tau_1}{\tau_2}}}
+                {\hana{\hGamma}{(\hexp_1, \zexp_2)}{\tprod{\tau_1}{\tau_2}}}
                 {\bigalpha}
         }
-
+    \\
+    \inferrule[]{
+            \suggest
+                {\hana{\hGamma}{\zexp_1}{\tau_1}}
+                {\bigalpha}\\
+            \hana{\hGamma}{\hexp_2}{\tau_2}
+        }{
+            \suggest
+                {\hana{\hGamma}{(\zexp_1, \hexp_2)}{\tprod{\tau_1}{\tau_2}}}
+                {\bigalpha}
+        }
+    \\
         \inferrule[]{
             \suggest
-                {\hsyn{\hGamma}{\zexp}{\tau_1}}
+                {\hsyn{\hGamma}{\zexp_1}{\tau_1}}
                 {\bigalpha} \\
             \arrmatch{\tau_1}{\tarr{\tau_2}{\tau}} \\
             \hana{\hGamma}{\hexp_2}{\tau_2}
         }{
             \suggest
-                {\hsyn{\hGamma}{\dap{\zexp_1}{\hexp_2}}{\tau}}
+                {\hana{\hGamma}{\dap{\zexp_1}{\hexp_2}}{\tau}}
                 {\bigalpha}
         }
-
+    \\
+    \inferrule[]{
+            \hsyn{\hGamma}{\hexp_1}{\tau_1}
+            \\
+            \arrmatch{\tau_1}{\tarr{\tau_2}{\tau}} \\
+            \suggest
+                {\hana{\hGamma}{\zexp_2}{\tau_2}}
+                {\bigalpha}
+        }{
+            \suggest
+                {\hana{\hGamma}{\dap{\hexp_1}{\zexp_2}}{\tau}}
+                {\bigalpha}
+        }
+    \\
         \inferrule[]{
             \arrmatch{\tau}{\tarr{\tau_1}{\tau_2}} \\
             \suggest
-                {\hana{\hGamma}{\zexp}{\tau}}
+                {\hana{\hGamma, x: \tau_1}{\zexp}{\tau_2}}
                 {\bigalpha}
         }{
             \suggest
                 {\hana{\hGamma}{\hlam{x}{\zexp}}{\tau}}
                 {\bigalpha}
         }
-
-
+    \\
+    \inferrule[DoesThisWork]{
+            \suggest
+                {\hana{\hGamma}{\zexp}{\tau}}
+                {\bigalpha}
+        }{
+            \suggest
+                {\hana{\hGamma}{\hhole{\zexp}}{\tau}}
+                {\bigalpha}
+        }
+    \\
     \end{mathpar}
-    \caption{Suggestion Zipper Cases}
+    \caption{Analytic Suggestion Zipper Cases}
     \label{fig:suggests_zipper}
 \end{figure}
 
 \begin{figure}
     \begin{mathpar}
+        \inferrule[Suggest Expr Syn]{
+            \suggest
+                {\hana{\hGamma}{\zexp}{\tehole{}}}
+                {\bigalpha_{}}
+        }{
+            \suggest
+                {\hsyn{\hGamma}{\zexp}{\_}}
+                {\bigalpha_{}}
+        }
+    \end{mathpar}
+    \caption{Synthetic Case}
+\end{figure}
+
+\begin{figure}
+    \begin{mathpar}
         \inferrule[Suggest Hole Analytic]{
-            \suggest{\mathsf{Intros}(\tau)}{\bigalpha_{intros}} \\
-            \suggest{\mathsf{Elims}(\Gamma, \tau)}{\bigalpha_{elims}}
+            \suggestStar{\mathsf{Intros}(\tau)}{\bigalpha_{intros}} \\
+            \suggestStar{\mathsf{Elims}(\Gamma, \tau)}{\bigalpha_{elims}}
         }{
             \suggest
                 {\hana{\hGamma}{\zwsel{\hehole{}}}{\tau}}
                 {\bigalpha_{intros} \cup \bigalpha_{elims}}
         }
-
+        \\
         \inferrule[Suggest Expr Analytic]{
-            \suggest{\mathsf{Wraps}(\hexp, \tau)}{\bigalpha_{wraps}} \\
-            \suggest{\mathsf{Replaces}(\Gamma, \tau)}{\bigalpha_{replaces}}
+            \suggestStar{\mathsf{Wraps}(\hexp, \tau)}{\bigalpha_{wraps}} \\
+            \suggestStar{\mathsf{Replaces}(\Gamma, \tau)}{\bigalpha_{replaces}}
         }{
             \suggest
                 {\hana{\hGamma}{\zwsel{\hexp}}{\tau}}
                 {\bigalpha_{wraps} \cup \bigalpha_{replaces}}
         }
-
+        \\
         \inferrule[Replacement]{
             \suggest
                 {\hana{\hGamma}{\zwsel{\hehole{}}}{\tau}}
                 {\bigalpha}
         }
         {
-            \suggest
+            \suggestStar
                 {\mathsf{Replaces}(\Gamma, \tau)}
                 {\{ \mathtt{del} \;;\; \alpha  \;|\; \alpha \in \bigalpha\}}
         }
-
+        \\
         \inferrule[Wrapping (simple)]{
             \hsyn{\hGamma}{\hexp}{\tau_e} \\
             \tconsistent{\tau_e}{\tau'}
         }
         {
-            \suggest
+            \suggestStar
                 {\mathsf{Wraps}(\hexp, \tau)}
-                {\{ \mathtt{construct\;} \dap{f}{\zwsel{\hexp}} \;|\; f : \tarr{\tau'}{\tau} \in \Gamma\}}
+                {\{ \construct{\dap{f}{\zwsel{\hexp}}} \;|\; f : \tarr{\tau'}{\tau} \in \Gamma\}}
         }        
     \end{mathpar}
-    \caption{Suggestion base cases}
+    \caption{Analytic base cases}
     \label{fig:suggests}
 \end{figure}
 
@@ -146,29 +267,40 @@ TODOs:
     \begin{mathpar}
     
         \inferrule[IntrosTriv]
-            {\tconsistent{\tau}{\tunit}}
-            {\suggest
-                {\mathsf{Intros}(\tau)}
-                {\singleaction{construct\; \zwsel{()}}}}
+            { }
+            {\suggestStar
+                {\mathsf{Intros}(\tunit)}
+                {\singleaction{\construct{\zwsel{()}}}}}
 
         \inferrule[IntrosProd]
-            {\tconsistent{\tau}{\tprod{\tau_1}{\tau_2}}}
-            {\suggest
-                {\mathsf{Intros}(\tau)}
-                {\singleaction{construct\; \hpair{\zwsel{\hehole{}}}{\hehole{}}}}}
+            { }
+            {\suggestStar
+                {\mathsf{Intros}(\tprod{\tau_1}{\tau_2})}
+                {\singleaction{\construct{\hpair{\zwsel{\hehole{}}}{\hehole{}}}}}}
         
         \inferrule[IntrosArrow]
-            {\tconsistent{\tau}{\tarr{\tau_1}{\tau_2}}}
-            {\suggest
-                {\mathsf{Intros}(\tau)}
-                {\singleaction{construct\; \hlam{x}{\zwsel{\hehole{}}}}}}
+            { }
+            {\suggestStar
+                {\mathsf{Intros}(\tarr{\tau_1}{\tau_2})}
+                {\singleaction{\construct{\hlam{x}{\zwsel{\hehole{}}}}}}}
 
         \inferrule[IntrosSum]
-            {\tconsistent{\tau}{\tsum{\tau_1}{\tau_2}}}
-            {\suggest
-                {\mathsf{Intros}(\tau)}
-                {\{ \mathtt{construct\; \hinL{\zwsel{\hehole{}}}},
-                 \mathtt{construct\; \hinR{\zwsel{\hehole{}}}}} \}}
+            { }
+            {\suggestStar
+                {\mathsf{Intros}(\tsum{\tau_1}{\tau_2})}
+                {\{{\construct{\hinL{\zwsel{\hehole{}}}}},
+                 {\construct{\hinR{\zwsel{\hehole{}}}}}} \}}
+
+        \inferrule[IntrosHole]
+            {
+            \suggestStar{\mathsf{Intros}(1)}{\bigalpha_{1}} \\
+            \suggestStar{\mathsf{Intros}(\tprod{\tehole}{\tehole})}{\bigalpha_{\tprod{}{}}} \\
+            \suggestStar{\mathsf{Intros}(\tsum{\tehole}{\tehole})}{\bigalpha_{\tsum{}{}}} \\
+             \suggestStar{\mathsf{Intros}(\tarr{\tehole}{\tehole})}{\bigalpha_{\tarr{}{}}} \\
+            }
+            {\suggestStar
+                {\mathsf{Intros}(\tehole{})}
+                {\bigalpha_{1} \cup {\bigalpha_{\tprod{}{}} \cup \bigalpha_{\tsum{}{}} \cup \bigalpha_{\tarr{}{}}}}}
 
     \end{mathpar}
     \caption{Introduction suggestions}
@@ -179,32 +311,32 @@ TODOs:
     \begin{mathpar}
 
         \inferrule[Suggest Elims]{
-            \suggest{\mathsf{ElimCase}}{\bigalpha_{case}} \\
-            \suggest{\mathsf{Var}(\Gamma, \tau)}{\bigalpha_{var}} \\
-            \suggest{\mathsf{AppProj}(\Gamma, \tau)}{\bigalpha_{approj}} \\
+            \suggestStar{\mathsf{ElimCase}}{\bigalpha_{case}} \\
+            \suggestStar{\mathsf{Var}(\Gamma, \tau)}{\bigalpha_{var}} \\
+            \suggestStar{\mathsf{AppProj}(\Gamma, \tau)}{\bigalpha_{approj}} \\
         }{
-         \suggest
+         \suggestStar
             {\mathsf{Elims}(\Gamma, \tau)}
             {\bigalpha_{case} \cup \bigalpha_{var} \cup \bigalpha_{approj}}
         }
 
         \inferrule[ElimCase]
             { }
-            {\suggest
+            {\suggestStar
                 {\mathsf{ElimCase}}
-                {\singleaction{construct\; \hcase{\zwsel{\hehole{}}}{x}{\hehole{}}{y}{\hehole{}}}}}
+                {\singleaction{\construct{\hcase{\zwsel{\hehole{}}}{x}{\hehole{}}{y}{\hehole{}}}}}}
 
         \inferrule[Var]
             {\tconsistent{\tau}{\tau'}}
-            {\suggest
+            {\suggestStar
                 {\mathsf{Var}(\Gamma, \tau)}
-                {\{\mathtt{construct \; \zwsel{x}} \;|\; x : \tau' \in \Gamma\}}}
+                {\{\mathtt{\construct{\zwsel{x}}} \;|\; x : \tau' \in \Gamma\}}}
 
         \inferrule[AppProj]
             {\tconsistent{\tau}{\tau'}}
-            {\suggest
+            {\suggestStar
                 {\mathsf{AppProj}(\Gamma, \tau)}
-                {\{\mathtt{construct \; \zwsel{e}}
+                {\{\mathtt{\construct{\zwsel{e}}}
                  \;|\;
                  x : \tau' \in \Gamma \; \wedge \; \varappjudge{\Gamma}{x}{e}{\tau}\}}}
 
@@ -222,6 +354,9 @@ TODOs:
         \inferrule[AppProjBase]
             {\hana{\Gamma}{\hexp}{\tau}}
             {\varappjudge{\Gamma}{e}{e}{\tau}}
+
+            % output type is tau'' != hole
+            %
 
         \inferrule[App]
             {
@@ -249,5 +384,77 @@ TODOs:
 
     \end{mathpar}
     \caption{Supporting elimination judgments}
+
     \label{fig:support_elims}
+    
+\end{figure}
+
+\begin{figure}
+    \begin{mathpar}
+    \centering
+    
+        \inferrule[Errors Triv]{ }
+        { \errorCount{()}{0} }
+
+        \inferrule[Errors Var]{ }
+        { \errorCount{x}{0} }
+
+        \inferrule[Errors EmptyHole]{ }
+        { \errorCount{\hehole{}}{0} }
+
+        \inferrule[Errors NonEmptyHole]
+        { \errorCount{\hexp}{n} }
+        { \errorCount{\hhole{\hexp}{}}{n+1} }
+
+        \inferrule[Errors Lambda]
+        { \errorCount{\hexp}{n} }
+        { \errorCount{\hlam{x}{\hexp}}{n+1} }
+
+        \inferrule[Errors Pair]{
+           \errorCount{\hexp_1}{n_1} \\
+           \errorCount{\hexp_2}{n_2} \\
+           n_1 + n_2 = n
+        }{ \errorCount{(\hexp_1,\hexp_2)}{n} }
+        
+        \inferrule[Errors Ap]{
+           \errorCount{\hexp_1}{n_1} \\
+           \errorCount{\hexp_2}{n_2} \\
+           n_1 + n_2 = n
+        }{ \errorCount{\dap{\hexp_1}{\hexp_2}}{n} }
+    \end{mathpar}
+    \caption{Count hole rules}
+\end{figure}
+
+\begin{figure}
+    \begin{itemize}
+        \item T3 (Suggestion sensibility theorem):\\
+        For all $\Gamma, \zexp, \tau, a \in \bigalpha$
+        where $\suggest
+        {\hana{\hGamma}{\zexp}{\tau}}
+        {\bigalpha}$ \\
+        there exists $\zexp', \tau'$ \\
+        such that $\numErrors{\removeSel{\hexp}} \leq \numErrors{\removeSel{\hexp'}}$
+        and $\performAna{\hGamma}{\zexp}{\tau}{\alpha}{\zexp'}$ \\
+        \\
+        \item T0 (Suggestion generalizes typing Ana):\\
+        For all $\Gamma, \zexp, \tau, \bigalpha$ \\
+        where $\suggest
+            {\hana{\hGamma}{\zexp}{\tau}}
+            {\bigalpha}$ \\
+        we have $\hana{\hGamma}{\removeSel{\zexp}}{\tau}$\\
+        \\
+        \item T1 (Existence and uniqueness of suggestions Ana):\\
+        For all $\Gamma, \zexp, \tau$
+        such that $\hana{\hGamma}{\removeSel{\zexp}}{\tau}$, \\
+        there exists a unique $\bigalpha$ such that 
+        $\suggest
+            {\hana{\hGamma}{\zexp}{\tau}}
+            {\bigalpha}$\\
+        \\
+        \item T2 (lemma for T1):\\
+        For all $\tau$ there exists a unique $\bigalpha$ such that \\
+        $\suggestStar {\mathsf{Intros}(\tau)} {\bigalpha}$\\
+        \\
+    \end{itemize}
+    \caption{Theorems & Lemmas}
 \end{figure}

@@ -4,6 +4,10 @@
 %   {\small\textcolor{cyan}{(\texttt{#1})}}\vspace{20px}%
 % }
 
+\usepackage{fontspec}
+\usepackage{extarrows}
+
+
 \newcommand{\cmttclo}[2]{\mathsf{clo}(#1, #2)}
 
 % \newcommand{\CaptionLabel}[2]{
@@ -109,9 +113,9 @@
 
 %\newcommand{\zwsel}[1]{\adjustbox{cframe=blue}{\ensuremath{{\textcolor{blue}{\triangleright}}{#1}{\textcolor{blue}{\triangleleft}}}}}
 \newcommand{\zwsel}[1]{
-  \setlength{\fboxsep}{0pt}
+ \setlength{\fboxsep}{0pt} 
   \colorbox{green!10!white!100}{
-    \ensuremath{{{\textcolor{Green}{{\hspace{-2px}\triangleright}}}}{#1}{\textcolor{Green}{\triangleleft{\vphantom{\tehole}}}}}}
+    \ensuremath{{{\textcolor{Green}{{\triangleright}}}}{#1}{\textcolor{Green}{\triangleleft{\vphantom{\tehole}}}}}}
 }
 %\newcommand{\zwsel}[1]{{\triangleright}{#1}{\triangleleft}}
 
@@ -298,4 +302,13 @@
 % Assistant Calculus
 
 \newcommand{\bigalpha}{\mathrm{A}}
-\newcommand{\suggest}[2]{#1 \curvearrowright #2} 
+\newcommand{\paperclip}{\fontspec{Symbola}\symbol{"1F4CE}}
+\newcommand{\suggestold}[2]{#1 \curvearrowright #2}
+\newcommand{\suggest}[2]{#1 \ $\fontspec{Symbola}\symbol{"1F4CE}$\  #2}
+\newcommand{\suggestStar}[2]{#1 \ $\fontspec{Symbola}\symbol{"1F4CE}*$\  #2} 
+\newcommand{\numErrors}[1]{\# #1}
+\newcommand{\errorCount}[2]{\numErrors{#1} = #2}
+
+\newcommand{\construct}[1] { \ $\fontspec{Symbola}\char"1F528$ \ #1 \; }
+\newcommand{\constructa}[1] { \ \mathtt{construct}\; #1}
+
